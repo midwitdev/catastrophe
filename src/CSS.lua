@@ -32,8 +32,8 @@ function CSS.Write(tb, tabLevel)
 	local str = tabs
 	for _, rule in pairs(tb) do
 		str = str .. (rule[1] .. " {") .. '\n'
-		for k,v in pairs(rule[2]) do
-			str = str .. (string.format("\t%s: %s;", k, v)) .. '\n'
+		for _,v in pairs(rule[2]) do
+			str = str .. (string.format("\t%s: %s;", v[1], v[2])) .. '\n'
 		end
 		str = str .. ("}")
 	end
