@@ -1,4 +1,4 @@
--- TwoColumn.lua
+-- Columns.lua
 -- Split a list of table exprs by odd/even into two columns
 return function (T)
     local t1 = {}
