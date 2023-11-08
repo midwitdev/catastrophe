@@ -171,9 +171,10 @@ function HTML.WriteElement(tb, tabLevel)
         local attrs = ""
         local i = 0
         for _, v in pairs(tb[2]) do
-            attrs = attrs .. string.format("%s=\"%s\"", v[1], v[2])
+            attrs = attrs .. string.format("%s=\"%s\" ", v[1], v[2])
             i = i + 1
         end
+        attrs = attrs:sub(1, -2)
         if i > 0 then
             str = ensureSpace(str) .. attrs
         end
@@ -236,31 +237,5 @@ function HTML.WriteElement(tb, tabLevel)
 
     return ensureNewline(str)
 end
-
-function imap(tb, fn)
-    local n = {}
-    for _, v in pairs(tb) do
-        n[#n + 1] = fn(v)
-    end
-    return n
-end
-
-function doeach(tb, fn)
-    for k, v in pairs(tb) do
-        fn(k, v)
-    end
-end
-
-doeach(
-    imap(
-        createDoc("Test Site", {
-            Body1 = Paragraph "Hello, world!",
-            Body2 = Paragraph "This is a test website!\n<br><br>Stuff is going to change soon!",
-            Subtitle = "This is a test website. Maybe something will go here!"
-        }, DARK_THEME),
-        HTML.WriteElement
-    ),
-    function(_, v) print(v) end
-)
 
 return HTML
