@@ -59,16 +59,16 @@ local html_doc =
             {"script", {src = "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"}, {}},
 
             {"style", {},
-                CSS.Write({
+                {
                     {"body", {
-                        {"background-color", "#333"},
-                        {"color", "#fff"},
+                        ["background-color"]= "#333",
+                        ["color"]= "#fff",
                     }},
                 
                     {"a", {
-                        {"color", "#66c2ff"},
+                        ["color"]="#66c2ff",
                     }}
-                })
+                }
             },
 
             {"meta", {
@@ -94,7 +94,7 @@ local html_doc =
         }},
         {"body", {}, {
             {"h1", {}, "Hello, world"},
-            {'hr', {}},
+            {'hr'},
             {"div", {class="container row"}, {
                 {"div", {class="col"}, {
                     {"p", {},
@@ -165,11 +165,23 @@ function HTML.WriteElement(tb, tabLevel)
             str = ensureNewline(str):sub(1, -2)
             str = str .. string.format("</%s>", tb[1])
         end
-    elseif type(tb[3])=="table" then
+    elseif type(tb[3])=="table" and tb[1] ~= "style" then
         str = tabs .. ensureNewline(string.format("<%s>", str))
         for _,v in pairs(tb[3]) do
             str = str .. ensureNewline(HTML.WriteElement(v, tabLevel + 1))
         end
+
+        if (count(tb[3]) > 0) then
+            str = ensureNewline(str)
+            str = str .. string.format("%s</%s>", tabs, tb[1])
+        else
+            str = ensureNewline(str):sub(1, -2)
+            str = str .. string.format("</%s>", tb[1])
+        end
+    elseif type(tb[3])=="table" and tb[1] == "style" then
+        str = tabs .. ensureNewline(string.format("<%s>", str))
+        local cssContent = CSS.Write(tb[3])
+        str = ensureNewline(str) .. tabs .. indentNewlines(cssContent, tabLevel)
 
         if (count(tb[3]) > 0) then
             str = ensureNewline(str)

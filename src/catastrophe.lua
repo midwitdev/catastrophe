@@ -1,7 +1,7 @@
 print "CATASTROPHE v1.0"
 
 local GEN = {
-	HTML =	require "HTML"
+	HTML =	require "HTML",
 	CSS =	require "CSS"
 }
 
