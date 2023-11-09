@@ -77,23 +77,6 @@ local function createDoc(TITLE, CONTENT, THEME)
         STYLE = { "style", {}, THEME }
     end
 
-    local numbers = {}
-
-    for i = 1, 9, 1 do
-        numbers[i] = {}
-        for j = 1, 9, 1 do
-            numbers[i][j] = string.format("%d * %d = %d", i, j, i * j)
-        end
-    end
-
-    local mulTable = Table2D(numbers)
-
-    local passwords = { { "#", "Password", "Length" } }
-
-    for i = #passwords + 1, 85 + (#passwords + 1), 1 do
-        passwords[i] = { i, PasswordGen(64), 64 }
-    end
-
     local html_doc =
     { "html", nil, {
         { "head", nil, {
@@ -136,7 +119,7 @@ end
 --print(HTML.WriteElement(T))
 
 
-function parseInputToTable()
+local function parseInputToTable()
     local result = {}
     
     for line in io.lines() do
@@ -168,11 +151,28 @@ end
     -- Read the input and parse it into a 2D array
 --local result = parseInputToTable()
 
+local numbers = {}
+
+for i = 1, 9, 1 do
+    numbers[i] = {}
+    for j = 1, 9, 1 do
+        numbers[i][j] = string.format("%d * %d = %d", i, j, i * j)
+    end
+end
+
+local mulTable = Table2D(numbers)
+
+local passwords = { { "#", "Password", "Length" } }
+
+for i = #passwords + 1, 85 + (#passwords + 1), 1 do
+    passwords[i] = { i, PasswordGen(64), 64 }
+end
+
 local result2 = TwoRow({
     TwoColumn({
         TwoRow({
-            {"h4", {{"class", "container text-center"}}, "Section 1"},
-            parseParagraphs()
+            {"h4", {{"class", "container text-center"}}, "Time Complexities"},
+            Table2D(parseInputToTable(), false, true)
         }),
         TwoRow({
             {"h4", {{"class", "container text-center"}}, "Section 2"},
@@ -180,7 +180,7 @@ local result2 = TwoRow({
         }),
     }),
     TwoRow({
-        {"h4", {{"class", "container text-center"}}, "Section 3"},
+        {"h4", {{"class", "container text-center"}}, "Section 1"},
         parseParagraphs()
     }),
 })
