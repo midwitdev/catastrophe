@@ -49,9 +49,11 @@ local function formatNumber(value)
     if value == math.floor(value) then
         return string.format("%.0f", value)
     else
-        return string.format("%.4f", value)
+        return string.format("%.2f", value)
     end
 end
+
+local ANNOTATE_CLASSES = false
 
 function HTML.WriteElement(tb, tabLevel)
     tabLevel = tabLevel or 0
@@ -61,13 +63,41 @@ function HTML.WriteElement(tb, tabLevel)
     end
     local str = tb[1]
 
+    if ANNOTATE_CLASSES then
+
+        local class = "lua-"..type(tb[3])
+        local classFound = false
+
+        if tostring(tb[3]) == "nan" then
+            class = ensureSpace(class) .. "lua-invalid"
+        end
+
+        if not tb[2] then tb[2] = {} end
+
+        for i,v in pairs(tb[2]) do
+            if v[1] == "class" then
+                classFound = v
+            end
+        end
+
+        if not classFound then
+            local c = {"class", class}
+            tb[2][#tb[2]+1] = c
+        else
+            classFound[2] = ensureSpace(classFound[2]) .. class
+        end
+
+    end
+
     if type(tb[2]) == "table" then
         local attrs = ""
         local i = 0
         for _, v in pairs(tb[2]) do
+            
             attrs = attrs .. string.format("%s=\"%s\" ", v[1], v[2])
             i = i + 1
         end
+
         attrs = attrs:sub(1, -2)
         if i > 0 then
             str = ensureSpace(str) .. attrs
@@ -79,6 +109,7 @@ function HTML.WriteElement(tb, tabLevel)
             tb[3] = formatNumber(tb[3])
         end
         tb[3] = tostring(tb[3])
+
         local newlineCount = 0
 
         for char in tb[3]:gmatch('\n') do

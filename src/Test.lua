@@ -43,9 +43,25 @@ local DARK_THEME =
         { "font-family",      "Mono" }
     } },
 
+    { "table tr .lua-number", {
+        { "background-color", "#222" },
+        { "color",            "#f22" },
+        { "font-family",      "Mono" }
+    } },
+
+    { "table tr .lua-string", {
+        { "background-color", "#222" },
+        { "color",            "#ff2" },
+        { "font-family",      "Mono" }
+    } },
+
     { "table tr th", {
         { "background-color", "#333" },
         { "color",            "#f22" },
+    } },
+
+    { ".lua-invalid", {
+        {"text-decoration", "line-through"}
     } },
 
     { "a", {
@@ -72,7 +88,7 @@ local function createDoc(TITLE, CONTENT, THEME)
 
     local mulTable = Table2D(numbers)
 
-    local passwords = {{"#", "Password", "Length"}}
+    local passwords = { { "#", "Password", "Length" } }
 
     for i = #passwords + 1, 85 + (#passwords + 1), 1 do
         passwords[i] = { i, PasswordGen(64), 64 }
@@ -105,43 +121,73 @@ local function createDoc(TITLE, CONTENT, THEME)
         } },
         { "body", {}, {
             { "h1", { { "class", "text-center" } },           TITLE },
-            { "h3", { { "class", "display-5 text-center" } }, CONTENT.Subtitle or "Subtitle" },
+            { "h5", { { "class", "text-center" } }, CONTENT.Subtitle or "Subtitle" },
             { 'hr' },
-            { "div", { { "class", "container-fluid row" } }, {
-                TwoColumn(
-                    {
-                        TwoRow({
-                            Table2D(
-                                {
-                                    { "",                              "Job",        "Salary",                      "Rating", "Experience" }, -- header
-                                    { { { "strong", {}, "Andrew" } },  "Programmer", 82500 + math.random() * 10000, 9.5,      "10 years" },
-                                    { { { "strong", {}, "John" } },    "Programmer", 78000 + math.random() * 10000, 8.0,      "7 years" },
-                                    { { { "strong", {}, "Steve" } },   "Programmer", 80000 + math.random() * 10000, 9.5,      "8 years" },
-                                    { { { "strong", {}, "Zane" } },    "Programmer", 85000 + math.random() * 10000, 10.0,     "9 years" },
-                                    { { { "strong", {}, "Michael" } }, "Programmer", 70000 + math.random() * 10000, 7.5,      "8 years" },
-                                }
-                            ),
-                            { "div", { { "class", "text-center container-fluid" } }, {
-                                { "h4", { { "class", "display-8" } },  "Job Board" },
-                                { "h6", { { "class", "display-10" } }, "Overview of Employees" }
-                            } },
-                        }),
-                        TwoRow({
-                            { "div", { { "class", "text-center container-fluid" } }, {
-                                { "h4", { { "class", "display-8" } },  "Generated Passwords" },
-                                { "h6", { { "class", "display-10" } }, "64 bytes" }
-                            } },
-                            Table2D(
-                                passwords
-                            )
-                        }),
-                    })
-            } }
+            { "div", { { "class", "container"}},
+                {CONTENT.Text}
+            }
         } },
     } }
     return html_doc
 end
 
-local T = createDoc("Table Demo", {}, DARK_THEME)
 
-print(HTML.WriteElement(T))
+
+--print(HTML.WriteElement(T))
+
+
+function parseInputToTable()
+    local result = {}
+    
+    for line in io.lines() do
+        if line == "" then break end
+        local row = {}
+        for value in line:gmatch("%S+") do
+            table.insert(row, tonumber(value) or value)
+        end
+        table.insert(result, row)
+    end
+    
+    return result
+end
+
+local function parseParagraphs()
+    local result = {}
+    
+    local linebrct = 0
+    for line in io.lines() do
+        if line == "" then linebrct = linebrct+1 end
+        if linebrct ==2 then break end
+
+        local paragraph = {"p", {{"class","text-left"}}, line}
+        result[#result+1] = paragraph
+    end
+    
+    return {"div", {}, result}
+end
+    -- Read the input and parse it into a 2D array
+--local result = parseInputToTable()
+
+local result2 = TwoRow({
+    TwoColumn({
+        TwoRow({
+            {"h4", {{"class", "container text-center"}}, "Section 1"},
+            parseParagraphs()
+        }),
+        TwoRow({
+            {"h4", {{"class", "container text-center"}}, "Section 2"},
+            parseParagraphs()
+        }),
+    }),
+    TwoRow({
+        {"h4", {{"class", "container text-center"}}, "Section 3"},
+        parseParagraphs()
+    }),
+})
+
+
+local T = createDoc("Paragraphs Demo", {Text=result2, Subtitle="catastrophe ssg sample"}, DARK_THEME)
+
+print(HTML.WriteElement(
+    T
+))

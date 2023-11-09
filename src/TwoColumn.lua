@@ -23,11 +23,18 @@ return function(T, LC)
         leftClass = leftClass .. "-" .. math.floor(LC)
     end
 
+    local e1 = { "div", { { "class", leftClass} }, t1 }
+    local e2 = nil
+
+    if t2 then
+        e2 = { "div", { { "class", "col mx-auto"} }, t2 }
+    end
+
     return
     { "div", { { "class", "mx-auto container-fluid row text-center lua-twocolumn" } },
         {
-            { "div", { { "class", leftClass} }, t1 },
-            { "div", { { "class", "col mx-auto"} }, t2 }
+            e1,
+            e2
         }
     }
 end
