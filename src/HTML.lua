@@ -37,126 +37,20 @@ function HTML.Plaintext(str)
     return str:gsub('\n', "<br>\n")
 end
 
-local scripts = {
-
-}
-
-local stylesheet =
-{
-    { "body", {
-        { "background-color", "#333" },
-        { "color",            "#fff" },
-    } },
-
-    { "a", {
-        { "color", "#66c2ff" },
-    } }
-}
-
-local DARK_THEME = {
-    { "body", {
-        { "background-color", "#333" },
-        { "color",            "#fff" }
-    } },
-
-    { "a", {
-        { "color", "#66c2ff" },
-    } }
-}
-
-local NO_THEME = nil
-
-local function createDoc(TITLE, CONTENT, THEME)
-    TITLE = TITLE or "Untitled Site"
-    local STYLE = nil
-
-    if THEME then
-        STYLE = {"style",{},THEME}
-    end
-
-    local html_doc =
-    {
-        { "!DOCTYPE html" },
-        { "html", nil, {
-            { "head", nil, {
-                { "script", { { "src", "https://code.jquery.com/jquery-3.5.1.slim.min.js" } },                         {} },
-                { "script", { { "src", "https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" } }, {} },
-                { "script", { { "src", "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" } },   {} },
-
-                STYLE,
-
-                { "meta", {
-                    { "charset", "UTF-8" }
-                } },
-
-                { "meta", {
-                    { "name",    "viewport" },
-                    { "content", "width=device-width, initial-scale=1.0" }
-                } },
-
-                { "link", {
-                    { "rel",  "stylesheet" },
-                    { "href", "https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" }
-                } },
-
-                { "title", nil, TITLE }
-            } },
-            { "body", {}, {
-                { "h1", {},                           TITLE },
-                { "h3", { { "class", "display-5" } }, CONTENT.Subtitle or "Subtitle" },
-                { 'hr' },
-                { "div", { { "class", "container row" } }, {
-                    { "div", { { "class", "col" } }, {
-                        CONTENT.Body1 or
-                        { "p", {}, HTML.Plaintext(
-                            "Each line here\n" ..
-                            "Will automatically convert\n" ..
-                            "to a <br> tag\n") }
-                    } },
-                    { "div", { { "class", "col" } }, {
-                        CONTENT.Body2 or
-                        { "p", {}, HTML.Plaintext(
-                            "Each line here\n" ..
-                            "Will automatically convert\n" ..
-                            "to a <br> tag\n") }
-                    } },
-                } }
-            } },
-        } }
-    }
-    return html_doc
-end
-
-local function Paragraph(TEXT)
-    return {"p", {},
-        HTML.Plaintext(TEXT)
-    }
-end
-
-function countOccurrences(inputString, targetSubstring)
-    local count = 0
-    local startPos = nil
-    startPos = 1
-
-    while true do
-        startPos = string.find(inputString, targetSubstring, startPos, true)
-        if startPos then
-            count = count + 1
-            startPos = startPos + 1
-        else
-            break
-        end
-    end
-
-    return count
-end
-
 local function count(t)
     local i = 0
     for _, _ in pairs(t) do
         i = i + 1
     end
     return i
+end
+
+local function formatNumber(value)
+    if value == math.floor(value) then
+        return string.format("%.0f", value)
+    else
+        return string.format("%.4f", value)
+    end
 end
 
 function HTML.WriteElement(tb, tabLevel)
@@ -180,7 +74,11 @@ function HTML.WriteElement(tb, tabLevel)
         end
     end
 
-    if type(tb[3]) == "string" then
+    if type(tb[3]) == "string" or type(tb[3]) == "number" or type(tb[3]) == "boolean" then
+        if type(tb[3])=="number" then
+            tb[3] = formatNumber(tb[3])
+        end
+        tb[3] = tostring(tb[3])
         local newlineCount = 0
 
         for char in tb[3]:gmatch('\n') do
@@ -227,12 +125,6 @@ function HTML.WriteElement(tb, tabLevel)
         end
     elseif tb[3] == nil then
         str = string.format("%s<%s>", tabs, str)
-    end
-
-    if tb[3] then
-
-    else
-        --str = str .. string.format("</%s>", tb[1])
     end
 
     return ensureNewline(str)

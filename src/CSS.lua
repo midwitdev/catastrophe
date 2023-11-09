@@ -1,29 +1,5 @@
 local CSS = {}
 
-local sample =
-{
-	{"body", {
-		{"background-color", "#333"},
-		{"color", "#fff"},
-	}},
-
-	{"a", {
-		{"color", "#66c2ff"},
-	}}
-}
-
---[[
-/* Dark mode styles */
-body {
-  background-color: #333; /* Dark background color */
-  color: #fff; /* Light text color */
-}
-
-a {
-  color: #66c2ff; /* Light link color */
-}
---]]
-
 function CSS.Write(tb, tabLevel)
 	local tabs = ""
 	for i = 0, (tabLevel or 0) do
@@ -40,7 +16,5 @@ function CSS.Write(tb, tabLevel)
 
 	return str
 end
-
-CSS.Write(sample)
 
 return CSS

@@ -1,5 +1,5 @@
--- Columns.lua
--- Split a list of table exprs by odd/even into two columns
+-- TwoRow.lua
+-- Split a list of table exprs by odd/even into two rows
 
 local HTML = require "HTML"
 
@@ -17,17 +17,17 @@ return function(T, LC)
         end
     end
 
-    local leftClass = "mx-auto col"
+    local leftClass = "row"
 
     if LC then
         leftClass = leftClass .. "-" .. math.floor(LC)
     end
 
     return
-    { "div", { { "class", "mx-auto container-fluid row text-center lua-twocolumn" } },
+    { "div", { { "class", "container-fluid col lua-tworow" } },
         {
             { "div", { { "class", leftClass} }, t1 },
-            { "div", { { "class", "col mx-auto"} }, t2 }
+            { "div", { { "class", "row"} }, t2 }
         }
     }
 end
