@@ -179,10 +179,6 @@ local result2 = TwoRow({
             parseParagraphs()
         }),
     }),
-    TwoRow({
-        {"h4", {{"class", "container text-center"}}, "Section 1"},
-        parseParagraphs()
-    }),
 })
 
 
