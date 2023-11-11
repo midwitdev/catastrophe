@@ -1,7 +1,24 @@
 local HTML = {}
-local CSS = require "CSS"
+local CSS = {}
 
 local TABCHAR = '\t'
+
+function CSS.Write(tb, tabLevel)
+	local tabs = ""
+	for i = 0, (tabLevel or 0) do
+		tabs = tabs .. '\t'
+	end
+	local str = tabs
+	for _, rule in pairs(tb) do
+		str = str .. (rule[1] .. " {") .. '\n'
+		for _,v in pairs(rule[2]) do
+			str = str .. (string.format("\t%s: %s;", v[1], v[2])) .. '\n'
+		end
+		str = str .. ("}")
+	end
+
+	return str
+end
 
 local function indentNewlines(input, tabLevel)
     tabLevel = tabLevel or 1
@@ -53,7 +70,7 @@ local function formatNumber(value)
     end
 end
 
-local ANNOTATE_CLASSES = false
+local ANNOTATE_CLASSES = true
 
 function HTML.WriteElement(tb, tabLevel)
     tabLevel = tabLevel or 0
@@ -64,8 +81,7 @@ function HTML.WriteElement(tb, tabLevel)
     local str = tb[1]
 
     if ANNOTATE_CLASSES then
-
-        local class = "lua-"..type(tb[3])
+        local class = "lua-" .. type(tb[3])
         local classFound = false
 
         if tostring(tb[3]) == "nan" then
@@ -74,26 +90,24 @@ function HTML.WriteElement(tb, tabLevel)
 
         if not tb[2] then tb[2] = {} end
 
-        for i,v in pairs(tb[2]) do
+        for i, v in pairs(tb[2]) do
             if v[1] == "class" then
                 classFound = v
             end
         end
 
         if not classFound then
-            local c = {"class", class}
-            tb[2][#tb[2]+1] = c
+            local c = { "class", class }
+            tb[2][#tb[2] + 1] = c
         else
             classFound[2] = ensureSpace(classFound[2]) .. class
         end
-
     end
 
     if type(tb[2]) == "table" then
         local attrs = ""
         local i = 0
         for _, v in pairs(tb[2]) do
-            
             attrs = attrs .. string.format("%s=\"%s\" ", v[1], v[2])
             i = i + 1
         end
@@ -105,7 +119,7 @@ function HTML.WriteElement(tb, tabLevel)
     end
 
     if type(tb[3]) == "string" or type(tb[3]) == "number" or type(tb[3]) == "boolean" then
-        if type(tb[3])=="number" then
+        if type(tb[3]) == "number" then
             tb[3] = formatNumber(tb[3])
         end
         tb[3] = tostring(tb[3])

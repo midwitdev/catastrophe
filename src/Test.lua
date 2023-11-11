@@ -15,6 +15,8 @@ local Infobox = require "Infobox"
 local TwoColumn = require "TwoColumn"
 local TwoRow = require "TwoRow"
 local Table2D = require "Table2D"
+local TopCaption = require "TopCaption"
+local Tree = require "Tree"
 
 function imap(tb, fn)
     local n = {}
@@ -43,25 +45,26 @@ local DARK_THEME =
         { "font-family",      "Mono" }
     } },
 
-    { "table tr .lua-number", {
+    { "table .lua-number", {
         { "background-color", "#222" },
-        { "color",            "#f22" },
+        { "color",            "#a22" },
         { "font-family",      "Mono" }
     } },
 
-    { "table tr .lua-string", {
+    { "table .lua-string", {
         { "background-color", "#222" },
-        { "color",            "#ff2" },
+        { "color",            "#82a" },
         { "font-family",      "Mono" }
     } },
 
     { "table tr th", {
-        { "background-color", "#333" },
-        { "color",            "#f22" },
+        { "background-color", "#333 !important" },
+        { "color",            "#28f !important" },
     } },
 
     { ".lua-invalid", {
-        {"text-decoration", "line-through"}
+        { "text-decoration", "line-through" },
+        { "color",           "#666 !important" }
     } },
 
     { "a", {
@@ -103,11 +106,11 @@ local function createDoc(TITLE, CONTENT, THEME)
             { "title", nil, TITLE }
         } },
         { "body", {}, {
-            { "h1", { { "class", "text-center" } },           TITLE },
+            { "h1", { { "class", "text-center" } }, TITLE or "Title" },
             { "h5", { { "class", "text-center" } }, CONTENT.Subtitle or "Subtitle" },
             { 'hr' },
-            { "div", { { "class", "container"}},
-                {CONTENT.Text}
+            { "div", { { "class", "container d-flex justify-content-center align-items-center text-center" } },
+                { CONTENT.Text }
             }
         } },
     } }
@@ -121,7 +124,7 @@ end
 
 local function parseInputToTable()
     local result = {}
-    
+
     for line in io.lines() do
         if line == "" then break end
         local row = {}
@@ -130,25 +133,25 @@ local function parseInputToTable()
         end
         table.insert(result, row)
     end
-    
+
     return result
 end
 
 local function parseParagraphs()
     local result = {}
-    
+
     local linebrct = 0
     for line in io.lines() do
-        if line == "" then linebrct = linebrct+1 end
-        if linebrct ==2 then break end
+        if line == "" then linebrct = linebrct + 1 end
+        if linebrct == 2 then break end
 
-        local paragraph = {"p", {{"class","text-left"}}, line}
-        result[#result+1] = paragraph
+        local paragraph = { "p", { { "class", "text-left" } }, HTML.Plaintext(line) }
+        result[#result + 1] = paragraph
     end
-    
-    return {"div", {}, result}
+
+    return { "div", {}, result }
 end
-    -- Read the input and parse it into a 2D array
+-- Read the input and parse it into a 2D array
 --local result = parseInputToTable()
 
 local numbers = {}
@@ -168,21 +171,26 @@ for i = #passwords + 1, 85 + (#passwords + 1), 1 do
     passwords[i] = { i, PasswordGen(64), 64 }
 end
 
-local result2 = TwoRow({
-    TwoColumn({
-        TwoRow({
-            {"h4", {{"class", "container text-center"}}, "Time Complexities"},
-            Table2D(parseInputToTable(), false, true)
-        }),
-        TwoRow({
-            {"h4", {{"class", "container text-center"}}, "Section 2"},
-            parseParagraphs()
-        }),
-    }),
+local result2 = Tree({
+    Test = "Test",
+    Thing = 15,
+    More = {
+        "One",
+        "Two",
+        "Three",
+        "Four",
+        "Five",
+        "Six"
+    }
 })
 
+local T = createDoc("Demo", { Text = result2, Subtitle = "catastrophe ssg sample" }, DARK_THEME)
 
-local T = createDoc("Paragraphs Demo", {Text=result2, Subtitle="catastrophe ssg sample"}, DARK_THEME)
+local result3 = Tree(
+    T
+)
+
+local T2 = createDoc("Demo", { Text = result3, Subtitle = "catastrophe ssg sample" }, DARK_THEME)
 
 print(HTML.WriteElement(
     T
