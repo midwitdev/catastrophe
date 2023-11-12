@@ -8,14 +8,12 @@ local function alphapairs(t)
     end
 
     table.sort(keys, function(a, b)
-        -- Compare numbers first
         if type(a) == "number" and type(b) ~= "number" then
             return true
         elseif type(a) ~= "number" and type(b) == "number" then
             return false
         end
 
-        -- Compare alphabetically for non-numeric keys
         return a < b
     end)
 
@@ -30,26 +28,37 @@ local function alphapairs(t)
     end
 end
 
+local NOBG = {"class","bg-transparent"}
+
+local function count (t) 
+    local c = 0
+    for _,_ in pairs(t) do c = c + 1 end
+    return c
+end
+
 local function f(tb)
-    local T = { "tbody", { { "class", "table table-responsive table-bordered" } }, {} }
+    local T = { "tbody", {}, {} }
     for k, v in alphapairs(tb) do
         local r = { "tr", {}, {} }
         if type(k) ~= "table" then
-            r[3][#r[3] + 1] = { "td", { { "style", "width:15%;" } }, k }
+            r[3][#r[3] + 1] = { "th", {}, k }
         else
-            r[3][#r[3] + 1] = { "td", nil, { f(k) } }
+            r[3][#r[3] + 1] = { "th", {}, {f(k)} }
         end
 
         if type(v) ~= "table" then
-            r[3][#r[3] + 1] = { "td", nil, v }
+            r[3][#r[3] + 1] = { "td", {}, v }
+        elseif count(v) <= 0 then
+            r[3][#r[3] + 1] = { "td", {}, "{ empty }" }
         else
-            r[3][#r[3] + 1] = { "td", nil, { f(v) } }
+            r[3][#r[3] + 1] = { "td", {}, {f(v)} }
         end
+
 
         T[3][#T[3] + 1] = r
     end
 
-    return { "table", {}, { T } }
+    return { "table", {{"class", "table table-striped table-condensed table-bordered"}}, { T } }
 end
 
 return f
